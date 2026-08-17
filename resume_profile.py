@@ -30,6 +30,15 @@ TARGET_ROLE_GROUPS = {
         "Analista de Onboarding ou Implantação",
         "Account Manager com carteira, sem hunting",
     ],
+    "IA aplicada, automações e aplicativos": [
+        "AI Creator Júnior",
+        "Analista de IA Generativa Júnior",
+        "Analista de Automação de Processos",
+        "Analista de Soluções e Automações",
+        "Desenvolvedora Low-Code / No-Code Júnior",
+        "Analista de Aplicações ou Sistemas Internos Júnior",
+        "Product Builder / Internal Tools Júnior",
+    ],
     "Vagas próximas e vagas-ponte": [
         "Analista ou Assistente de Operações",
         "Analista de Processos",
@@ -43,6 +52,14 @@ TARGET_ROLE_GROUPS = {
 
 
 HEADLINE_RULES = [
+    (
+        ("ai creator", "ia generativa", "generative ai", "genai", "inteligencia artificial aplicada"),
+        "AI Creator | IA Generativa | Automação | Produtos Digitais",
+    ),
+    (
+        ("automacao de processos", "process automation", "low-code", "low code", "no-code", "no code", "aplicacoes internas", "internal tools", "streamlit", "supabase"),
+        "Automação de Processos | Aplicativos Internos | Dados | Operações",
+    ),
     (
         ("revops", "revenue operations", "sales ops", "sales operations", "operacoes comerciais", "inteligencia comercial", "sales enablement"),
         "Revenue Operations | Sales Operations | CRM | Inteligência Comercial",
