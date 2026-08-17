@@ -46,6 +46,27 @@ class ScoringTest(unittest.TestCase):
         })
         self.assertEqual(result.decision, "BLOQUEADA")
 
+    def test_adjacent_operations_role_enters_daily_review(self):
+        result = score_job({
+            "title": "Analista de Operações Júnior",
+            "location": "Brasil",
+            "work_mode": "Remoto",
+            "salary_min": 3500,
+            "description": "Gestão de processos, projetos, indicadores e dashboards em Excel.",
+        })
+        self.assertGreaterEqual(result.score, 70)
+        self.assertIn(result.decision, {"AUTOAPLICAR", "REVISAR"})
+
+    def test_revops_role_is_prioritized(self):
+        result = score_job({
+            "title": "Analista de RevOps Júnior",
+            "location": "Brasil",
+            "work_mode": "Remoto",
+            "salary_min": 4500,
+            "description": "CRM, HubSpot, indicadores, automação e processos comerciais.",
+        })
+        self.assertEqual(result.decision, "AUTOAPLICAR")
+
 
 if __name__ == "__main__":
     unittest.main()
