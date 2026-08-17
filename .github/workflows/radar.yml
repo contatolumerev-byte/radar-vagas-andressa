@@ -2,6 +2,10 @@ name: Triagem gratuita de vagas
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/radar.yml"
   schedule:
     - cron: "0 11,16,21 * * 1-5"
 
