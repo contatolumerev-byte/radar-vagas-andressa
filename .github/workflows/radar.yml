@@ -1,0 +1,25 @@
+name: Triagem gratuita de vagas
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 11,16,21 * * 1-5"
+
+permissions:
+  contents: read
+
+jobs:
+  triagem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python automation.py
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
