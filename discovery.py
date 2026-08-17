@@ -13,10 +13,14 @@ from gmail_service import fetch_job_alert_links
 
 
 SEARCH_TERMS = [
-    "customer success", "relacionamento com cliente", "revops", "sales ops",
-    "inteligencia comercial", "assistente comercial", "analista de operacoes",
-    "analista de processos", "analista de projetos", "analista de crm",
-    "analista de dados junior",
+    "analista de operacoes comerciais", "analista de inteligencia comercial",
+    "sales operations", "sales ops", "revops junior", "revenue operations",
+    "sales enablement", "analista de customer success", "customer experience",
+    "relacionamento b2b", "customer operations", "onboarding de clientes",
+    "analista de implantacao", "analista de operacoes", "analista de processos",
+    "analista de projetos junior", "pmo junior", "analista de crm",
+    "analista de indicadores", "analista de performance junior",
+    "assistente de operacoes", "assistente comercial inbound",
 ]
 
 HEADERS = {"User-Agent": "RadarVagasAndressa/1.0 (busca pessoal de empregos)"}
