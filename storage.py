@@ -52,7 +52,7 @@ DEMO_JOBS = [
 def _supabase_client():
     try:
         url = st.secrets.get("SUPABASE_URL")
-        key = st.secrets.get("SUPABASE_SERVICE_ROLE_KEY")
+        key = st.secrets.get("SUPABASE_SECRET_KEY") or st.secrets.get("SUPABASE_SERVICE_ROLE_KEY")
         if not url or not key:
             return None
         from supabase import create_client
@@ -89,4 +89,3 @@ def add_job(job: dict) -> dict:
     row["id"] = f"local-{len(list_jobs()) + 1}"
     st.session_state.jobs.insert(0, row)
     return row
-
