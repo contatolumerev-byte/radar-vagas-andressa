@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import quote, urljoin
 
 import requests
@@ -102,27 +103,40 @@ def fetch_job_detail(url: str, title_hint: str = "", source: str = "Web") -> dic
     return {"title": title_hint or (soup.title.string if soup.title else "Vaga"), "company": source, "location": "", "work_mode": "Remoto" if "remoto" in description.lower() else "Não informado", "salary_min": None, "description": " ".join(description.split())[:20000], "url": url, "source": source}
 
 
-def discover_gupy(limit_per_term: int = 6) -> list[dict]:
-    links: dict[str, str] = {}
-    for term in SEARCH_TERMS:
-        search_url = "https://portal.gupy.io/job-search/" + quote(f"term={term}", safe="")
-        try:
-            response = requests.get(search_url, headers=HEADERS, timeout=20)
-            response.raise_for_status()
-        except requests.RequestException:
+def _search_gupy_term(term: str, limit: int) -> list[tuple[str, str]]:
+    search_url = "https://portal.gupy.io/job-search/" + quote(f"term={term}", safe="")
+    try:
+        response = requests.get(search_url, headers=HEADERS, timeout=12)
+        response.raise_for_status()
+    except requests.RequestException:
+        return []
+    soup = BeautifulSoup(response.text, "html.parser")
+    matches: list[tuple[str, str]] = []
+    for anchor in soup.find_all("a", href=True):
+        href = anchor["href"]
+        if "/job/" not in href:
             continue
-        soup = BeautifulSoup(response.text, "html.parser")
-        count = 0
-        for anchor in soup.find_all("a", href=True):
-            href = anchor["href"]
-            if "/job/" not in href:
-                continue
-            url = urljoin("https://portal.gupy.io", href)
-            links[url] = " ".join(anchor.get_text(" ", strip=True).split())[:240] or term
-            count += 1
-            if count >= limit_per_term:
-                break
-    return [job for url, title in links.items() if (job := fetch_job_detail(url, title, "Gupy"))]
+        url = urljoin("https://portal.gupy.io", href)
+        title = " ".join(anchor.get_text(" ", strip=True).split())[:240] or term
+        matches.append((url, title))
+        if len(matches) >= limit:
+            break
+    return matches
+
+
+def discover_gupy(limit_per_term: int = 3) -> list[dict]:
+    links: dict[str, str] = {}
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        for matches in pool.map(lambda term: _search_gupy_term(term, limit_per_term), SEARCH_TERMS):
+            for url, title in matches:
+                links[url] = title
+
+    def load_detail(item: tuple[str, str]) -> dict | None:
+        url, title = item
+        return fetch_job_detail(url, title, "Gupy")
+
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        return [job for job in pool.map(load_detail, links.items()) if job]
 
 
 def discover_all() -> list[dict]:
