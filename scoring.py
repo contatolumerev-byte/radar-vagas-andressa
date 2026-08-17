@@ -8,6 +8,12 @@ from dataclasses import dataclass, asdict
 
 
 ROLE_FAMILIES = [
+    ("IA aplicada, Automação e Aplicativos", 32, [
+        "ai creator", "analista de ia generativa", "generative ai analyst",
+        "analista de automacao", "automacao de processos", "process automation",
+        "analista de solucoes", "low-code", "low code", "no-code", "no code",
+        "aplicacoes internas", "internal tools", "product builder",
+    ]),
     ("Customer Success e Relacionamento", 34, [
         "customer success", "sucesso do cliente", "customer experience",
         "experiencia do cliente", "analista de relacionamento", "customer care",
@@ -65,6 +71,18 @@ POSITIVE_TERMS = {
     "automacao": 4,
     "projetos": 4,
     "dados": 4,
+    "ia generativa": 5,
+    "inteligencia artificial": 5,
+    "streamlit": 5,
+    "supabase": 5,
+    "python": 4,
+    "javascript": 3,
+    "low-code": 5,
+    "no-code": 5,
+    "aplicativos internos": 5,
+    "aplicacoes internas": 5,
+    "automacao de processos": 5,
+    "api": 3,
     "segunda a sexta": 5,
 }
 
@@ -81,6 +99,11 @@ HARD_BLOCKS = {
     "escala 6x1": "Escala 6x1",
     "shopping": "Ambiente de shopping",
     "call center": "Rotina de call center",
+    "machine learning engineer": "Engenharia de Machine Learning fora do foco atual",
+    "engenheiro de machine learning": "Engenharia de Machine Learning fora do foco atual",
+    "engenheira de machine learning": "Engenharia de Machine Learning fora do foco atual",
+    "data scientist": "Ciência de Dados fora do foco atual",
+    "cientista de dados": "Ciência de Dados fora do foco atual",
 }
 
 REVIEW_TERMS = {
