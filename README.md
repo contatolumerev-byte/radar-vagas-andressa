@@ -33,12 +33,12 @@ O app abre imediatamente em modo demonstração. Não é necessário cadastrar c
 
 ```toml
 SUPABASE_URL = "sua-url"
-SUPABASE_SERVICE_ROLE_KEY = "sua-chave-service-role"
+SUPABASE_SECRET_KEY = "sua-chave-sb-secret"
 ```
 
 4. Nos Secrets do repositório GitHub, cadastre os mesmos nomes para o workflow.
 
-Nunca envie essas chaves em conversa, commit ou captura de tela. A chave `service_role` fica somente nos cofres de secrets.
+Nunca envie essas chaves em conversa, commit ou captura de tela. A chave `sb_secret_...` fica somente nos cofres de secrets. Projetos antigos também podem usar `SUPABASE_SERVICE_ROLE_KEY` com a chave legada `service_role`.
 
 ## Conectar o Gemini gratuitamente
 
