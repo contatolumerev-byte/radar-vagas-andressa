@@ -80,7 +80,7 @@ def add_job(job: dict) -> dict:
     row = {
         **job,
         **result.to_dict(),
-        "status": "Na fila" if result.decision in {"AUTOAPLICAR", "REVISAR"} else result.decision.title(),
+        "status": "Aguardando aprovação" if result.decision in {"AUTOAPLICAR", "REVISAR"} else result.decision.title(),
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     client = _supabase_client()
@@ -89,3 +89,14 @@ def add_job(job: dict) -> dict:
     row["id"] = f"local-{len(list_jobs()) + 1}"
     st.session_state.jobs.insert(0, row)
     return row
+
+
+def update_status(job_id: str, status: str) -> None:
+    client = _supabase_client()
+    if client:
+        client.table("jobs").update({"status": status}).eq("id", job_id).execute()
+        return
+    for job in list_jobs():
+        if str(job.get("id")) == str(job_id):
+            job["status"] = status
+            return
