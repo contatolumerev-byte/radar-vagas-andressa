@@ -32,6 +32,10 @@ ROLE_HINTS = (
     "sales ops", "operações", "operacoes", "processos", "projetos",
     "crm", "marketing", "dados", "data", "bi ", "atendimento",
     "backoffice", "implantação", "implantacao", "implementação",
+    "ai creator", "ia generativa", "inteligência artificial",
+    "inteligencia artificial", "automação", "automacao", "aplicativo",
+    "low-code", "low code", "no-code", "no code", "internal tools",
+    "streamlit", "supabase",
 )
 
 
