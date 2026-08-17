@@ -29,7 +29,8 @@ def personalize(job: dict) -> str:
     from google import genai
 
     client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
-    model = st.secrets.get("GEMINI_MODEL", "gemini-2.5-flash")
+    configured_model = st.secrets.get("GEMINI_MODEL", "gemini-3-flash-preview")
+    model = "gemini-3-flash-preview" if configured_model == "gemini-2.5-flash" else configured_model
     prompt = f"""
 Você auxilia uma candidata brasileira a personalizar uma candidatura com honestidade.
 
@@ -57,7 +58,12 @@ Entregue exatamente estas seções:
 5. PONTOS PARA CONFIRMAR: requisitos da vaga que não podem ser comprovados pelo perfil fornecido.
 """.strip()
 
-    response = client.models.generate_content(model=model, contents=prompt)
+    try:
+        response = client.models.generate_content(model=model, contents=prompt)
+    except Exception as error:
+        if "404" not in str(error) and "NOT_FOUND" not in str(error):
+            raise
+        response = client.models.generate_content(model="gemini-3-flash-preview", contents=prompt)
     if not response.text:
         raise RuntimeError("O Gemini não devolveu conteúdo. Tente novamente mais tarde.")
     return response.text.strip()
