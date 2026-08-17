@@ -15,6 +15,14 @@ PROFILE_HEADER = {
 
 
 TARGET_ROLE_GROUPS = {
+    "Recolocação rápida": [
+        "Assistente ou Analista de Atendimento ao Cliente",
+        "Customer Support / Customer Service",
+        "Assistente de Relacionamento ou Pós-venda",
+        "Assistente Comercial inbound",
+        "Consultora Comercial inbound, sem hunting",
+        "Consultora Comercial de pequenas empresas",
+    ],
     "Prioridade principal": [
         "Analista de Operações Comerciais",
         "Analista de Inteligência Comercial",
@@ -45,8 +53,7 @@ TARGET_ROLE_GROUPS = {
         "Analista ou Assistente de Projetos / PMO",
         "Analista de CRM",
         "Analista de Indicadores ou Performance Júnior",
-        "Analista de Backoffice ou Atendimento",
-        "Assistente ou Consultora Comercial inbound, sem hunting",
+        "Analista de Backoffice",
     ],
 }
 
