@@ -5,7 +5,7 @@ import streamlit as st
 
 from gemini_service import configured as gemini_configured, personalize
 from scoring import score_job
-from storage import add_job, list_jobs, mode
+from storage import add_job, list_jobs, mode, update_status
 
 
 st.set_page_config(page_title="Radar de Vagas da Andressa", page_icon="🎯", layout="wide")
@@ -38,6 +38,7 @@ def jobs_table(rows: list[dict]) -> None:
         st.info("Nenhuma vaga nesta lista.")
         return
     frame = pd.DataFrame(rows)
+    frame["decision"] = frame["decision"].replace({"AUTOAPLICAR": "PRIORIDADE 85+", "REVISAR": "COMPATÍVEL 70–84"})
     columns = ["decision", "score", "title", "company", "location", "work_mode", "salary_min", "status", "url"]
     columns = [column for column in columns if column in frame.columns]
     frame = frame[columns].rename(
@@ -57,7 +58,7 @@ def jobs_table(rows: list[dict]) -> None:
 
 
 st.sidebar.title("🎯 Radar da Andressa")
-page = st.sidebar.radio("Navegação", ["Painel", "Vagas", "Fila de revisão", "Personalizar com Gemini", "Currículos", "Configurações", "Conexões"])
+page = st.sidebar.radio("Navegação", ["Painel", "Vagas", "Aprovação do dia", "Personalizar com Gemini", "Currículos", "Configurações", "Conexões"])
 st.sidebar.caption(f"Modo atual: {mode()}")
 
 jobs = enriched_jobs()
@@ -67,8 +68,8 @@ if page == "Painel":
     st.caption("As melhores oportunidades primeiro, com regras claras e controle sobre exceções.")
     metrics = st.columns(5)
     metrics[0].metric("Vagas", len(jobs))
-    metrics[1].metric("Autoaplicar", sum(j["decision"] == "AUTOAPLICAR" for j in jobs))
-    metrics[2].metric("Revisar", sum(j["decision"] == "REVISAR" for j in jobs))
+    metrics[1].metric("Prioridade 85+", sum(j["decision"] == "AUTOAPLICAR" for j in jobs))
+    metrics[2].metric("Compatíveis 70–84", sum(j["decision"] == "REVISAR" for j in jobs))
     metrics[3].metric("Bloqueadas", sum(j["decision"] == "BLOQUEADA" for j in jobs))
     metrics[4].metric("Entrevistas", sum(j.get("status") == "Entrevista" for j in jobs))
     st.subheader("Vagas mais aderentes")
@@ -100,11 +101,28 @@ elif page == "Vagas":
                     saved = add_job({"title": title, "company": company, "location": location, "work_mode": work_mode, "salary_min": salary or None, "url": url, "description": description})
                     st.success(f"Vaga analisada: {saved['decision']} — nota {saved['score']}/100.")
 
-elif page == "Fila de revisão":
-    st.title("Ação da Andressa")
-    st.caption("Itens que exigem decisão humana ficam aqui; o robô não inventa respostas.")
-    queue = [job for job in jobs if job["decision"] == "REVISAR" or job.get("status") == "Ação da Andressa"]
+elif page == "Aprovação do dia":
+    st.title("Aprovação do dia")
+    st.caption("Todas as vagas com nota a partir de 70 aguardam sua aprovação antes da personalização e do envio.")
+    queue = [
+        job for job in jobs
+        if job["decision"] in {"AUTOAPLICAR", "REVISAR"}
+        and job.get("status") not in {"Aprovada", "Rejeitada", "Enviada"}
+    ]
     jobs_table(queue)
+    if queue:
+        labels = {f"{job['score']} — {job['title']} — {job['company']}": job for job in queue}
+        approved = st.multiselect("Selecione as vagas para candidatar", list(labels))
+        col_approve, col_reject = st.columns(2)
+        if col_approve.button("Aprovar candidaturas", disabled=not approved, type="primary"):
+            for label in approved:
+                update_status(labels[label]["id"], "Aprovada")
+            st.success(f"{len(approved)} vaga(s) aprovada(s) para personalização.")
+            st.rerun()
+        if col_reject.button("Descartar selecionadas", disabled=not approved):
+            for label in approved:
+                update_status(labels[label]["id"], "Rejeitada")
+            st.rerun()
     st.warning("Perguntas sobre saúde/PcD/adaptação, pretensão ambígua, vídeo, CAPTCHA, SMS ou autenticação nunca serão respondidas automaticamente.")
 
 elif page == "Personalizar com Gemini":
@@ -113,9 +131,9 @@ elif page == "Personalizar com Gemini":
     if not gemini_configured():
         st.warning("Gemini ainda não conectado. Adicione GEMINI_API_KEY nos Secrets do Streamlit.")
         st.code('GEMINI_API_KEY = "cole-a-chave-aqui"\nGEMINI_MODEL = "gemini-2.5-flash"', language="toml")
-    eligible = [job for job in jobs if job["decision"] != "BLOQUEADA"]
+    eligible = [job for job in jobs if job.get("status") == "Aprovada"]
     if not eligible:
-        st.info("Não há vagas elegíveis para personalizar.")
+        st.info("Aprove primeiro uma vaga na página Aprovação do dia.")
     else:
         labels = {f"{job['title']} — {job['company']} ({job['score']}/100)": job for job in eligible}
         selected_label = st.selectbox("Escolha uma vaga", list(labels))
@@ -148,10 +166,11 @@ elif page == "Currículos":
 
 elif page == "Configurações":
     st.title("Regras de busca e envio")
-    st.number_input("Nota mínima para envio automático", min_value=70, max_value=100, value=85, disabled=True)
-    st.number_input("Nota mínima para revisão", min_value=0, max_value=100, value=70, disabled=True)
+    st.number_input("Nota de prioridade", min_value=70, max_value=100, value=85, disabled=True)
+    st.number_input("Nota mínima para aprovação diária", min_value=0, max_value=100, value=70, disabled=True)
     st.number_input("Salário mínimo mensal", min_value=0, value=2500, step=100, disabled=True)
-    st.write("**Trilhas:** Customer Success/Relacionamento; Assistente ou Consultora Comercial sem hunting.")
+    st.write("**Trilhas principais:** Customer Success/Relacionamento, RevOps/Sales Ops e Comercial consultivo sem hunting.")
+    st.write("**Trilhas adjacentes:** Operações, Processos, Projetos, CRM, Marketing Operacional, Dados/BI Júnior e Backoffice.")
     st.write("**Prioridade:** remoto no Brasil; híbrido/presencial somente em Fortaleza.")
     st.write("**Bloqueios:** hunting, outbound/cold call, telemarketing ativo, venda externa/porta a porta, shopping e escala 6x1.")
     st.caption("A edição persistente dessas regras será liberada após conectar o banco.")
