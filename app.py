@@ -3,6 +3,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
+from gemini_service import configured as gemini_configured, personalize
 from scoring import score_job
 from storage import add_job, list_jobs, mode
 
@@ -56,7 +57,7 @@ def jobs_table(rows: list[dict]) -> None:
 
 
 st.sidebar.title("🎯 Radar da Andressa")
-page = st.sidebar.radio("Navegação", ["Painel", "Vagas", "Fila de revisão", "Currículos", "Configurações", "Conexões"])
+page = st.sidebar.radio("Navegação", ["Painel", "Vagas", "Fila de revisão", "Personalizar com Gemini", "Currículos", "Configurações", "Conexões"])
 st.sidebar.caption(f"Modo atual: {mode()}")
 
 jobs = enriched_jobs()
@@ -106,6 +107,32 @@ elif page == "Fila de revisão":
     jobs_table(queue)
     st.warning("Perguntas sobre saúde/PcD/adaptação, pretensão ambígua, vídeo, CAPTCHA, SMS ou autenticação nunca serão respondidas automaticamente.")
 
+elif page == "Personalizar com Gemini":
+    st.title("Personalização com Gemini")
+    st.caption("O Gemini sugere texto; as regras objetivas e os bloqueios continuam sob controle do sistema.")
+    if not gemini_configured():
+        st.warning("Gemini ainda não conectado. Adicione GEMINI_API_KEY nos Secrets do Streamlit.")
+        st.code('GEMINI_API_KEY = "cole-a-chave-aqui"\nGEMINI_MODEL = "gemini-2.5-flash"', language="toml")
+    eligible = [job for job in jobs if job["decision"] != "BLOQUEADA"]
+    if not eligible:
+        st.info("Não há vagas elegíveis para personalizar.")
+    else:
+        labels = {f"{job['title']} — {job['company']} ({job['score']}/100)": job for job in eligible}
+        selected_label = st.selectbox("Escolha uma vaga", list(labels))
+        selected_job = labels[selected_label]
+        if selected_job["decision"] == "DESCARTAR":
+            st.warning("A vaga está abaixo da nota de revisão. A personalização não muda essa decisão.")
+        if st.button("Gerar personalização", disabled=not gemini_configured()):
+            try:
+                with st.spinner("Analisando a vaga sem inventar informações..."):
+                    st.session_state.gemini_result = personalize(selected_job)
+                st.success("Personalização gerada. Revise antes de usar.")
+            except Exception as error:
+                st.error(f"Não foi possível consultar o Gemini: {error}")
+        if st.session_state.get("gemini_result"):
+            st.markdown(st.session_state.gemini_result)
+    st.info("Privacidade: no plano gratuito, não envie telefone, e-mail, CPF, endereço, currículo completo ou informações de saúde ao Gemini.")
+
 elif page == "Currículos":
     st.title("Currículos e personalização")
     col1, col2 = st.columns(2)
@@ -136,5 +163,8 @@ else:
         st.success("Supabase: conectado")
     else:
         st.warning("Supabase: ainda não conectado; o app está em modo demonstração")
-    st.info("Gemini: opcional. A primeira versão funciona sem API de IA e sem cobrança.")
+    if gemini_configured():
+        st.success("Gemini: conectado")
+    else:
+        st.warning("Gemini: ainda não conectado")
     st.write("GitHub Actions executará a triagem em horários programados depois que os segredos do Supabase forem cadastrados.")
