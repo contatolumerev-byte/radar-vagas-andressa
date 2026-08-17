@@ -88,6 +88,38 @@ class ScoringTest(unittest.TestCase):
         })
         self.assertEqual(result.decision, "BLOQUEADA")
 
+    def test_remote_customer_service_enters_daily_queue(self):
+        result = score_job({
+            "title": "Assistente de Atendimento ao Cliente",
+            "location": "Brasil",
+            "work_mode": "Remoto",
+            "salary_min": 2800,
+            "description": "Atendimento, relacionamento, registro em CRM e suporte ao cliente de segunda a sexta.",
+        })
+        self.assertGreaterEqual(result.score, 70)
+        self.assertIn(result.decision, {"AUTOAPLICAR", "REVISAR"})
+
+    def test_small_business_inbound_consultant_enters_daily_queue(self):
+        result = score_job({
+            "title": "Consultora Comercial",
+            "location": "Fortaleza",
+            "work_mode": "Presencial",
+            "salary_min": 3000,
+            "description": "Atendimento inbound de pequenas empresas, relacionamento, propostas, carteira de clientes e CRM.",
+        })
+        self.assertGreaterEqual(result.score, 70)
+        self.assertIn(result.decision, {"AUTOAPLICAR", "REVISAR"})
+
+    def test_telemarketing_stays_blocked(self):
+        result = score_job({
+            "title": "Agente de Atendimento",
+            "location": "Fortaleza",
+            "work_mode": "Presencial",
+            "salary_min": 2800,
+            "description": "Atendimento por telemarketing em call center.",
+        })
+        self.assertEqual(result.decision, "BLOQUEADA")
+
 
 if __name__ == "__main__":
     unittest.main()
