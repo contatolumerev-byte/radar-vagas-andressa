@@ -48,7 +48,7 @@ Nunca envie essas chaves em conversa, commit ou captura de tela. A chave `sb_sec
 
 ```toml
 GEMINI_API_KEY = "sua-chave"
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3-flash-preview"
 ```
 
 O Gemini é chamado somente quando você clica em **Gerar personalização**. No nível gratuito, não envie telefone, e-mail, CPF, endereço, currículo completo nem informações de saúde; use apenas o perfil profissional aprovado e a descrição pública da vaga.
