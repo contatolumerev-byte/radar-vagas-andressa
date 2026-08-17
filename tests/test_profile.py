@@ -30,6 +30,20 @@ class ProfileHeadlineTest(unittest.TestCase):
         self.assertEqual(header["email"], "contato.andressafreire@gmail.com")
         self.assertEqual(header["location"], "Fortaleza – CE")
 
+    def test_ai_creator_headline(self):
+        headline = headline_for_job({
+            "title": "AI Creator Júnior",
+            "description": "Criação de soluções com IA generativa e automações.",
+        })
+        self.assertEqual(headline, "AI Creator | IA Generativa | Automação | Produtos Digitais")
+
+    def test_internal_apps_automation_headline(self):
+        headline = headline_for_job({
+            "title": "Analista de Automação de Processos",
+            "description": "Aplicações internas low-code integradas a dados.",
+        })
+        self.assertEqual(headline, "Automação de Processos | Aplicativos Internos | Dados | Operações")
+
 
 if __name__ == "__main__":
     unittest.main()
