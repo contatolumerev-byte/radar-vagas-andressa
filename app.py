@@ -4,6 +4,7 @@ import pandas as pd
 import streamlit as st
 
 from gemini_service import configured as gemini_configured, personalize
+from gmail_service import configured as gmail_configured, test_connection as test_gmail
 from scoring import score_job
 from storage import add_job, list_jobs, mode, update_status
 
@@ -130,7 +131,7 @@ elif page == "Personalizar com Gemini":
     st.caption("O Gemini sugere texto; as regras objetivas e os bloqueios continuam sob controle do sistema.")
     if not gemini_configured():
         st.warning("Gemini ainda não conectado. Adicione GEMINI_API_KEY nos Secrets do Streamlit.")
-        st.code('GEMINI_API_KEY = "cole-a-chave-aqui"\nGEMINI_MODEL = "gemini-2.5-flash"', language="toml")
+        st.code('GEMINI_API_KEY = "cole-a-chave-aqui"\nGEMINI_MODEL = "gemini-3-flash-preview"', language="toml")
     eligible = [job for job in jobs if job.get("status") == "Aprovada"]
     if not eligible:
         st.info("Aprove primeiro uma vaga na página Aprovação do dia.")
@@ -186,4 +187,16 @@ else:
         st.success("Gemini: conectado")
     else:
         st.warning("Gemini: ainda não conectado")
+    if gmail_configured():
+        st.success("Gmail: configurado")
+        if st.button("Testar conexão do Gmail"):
+            try:
+                if test_gmail():
+                    st.success("Gmail conectado com sucesso.")
+                else:
+                    st.error("O Gmail recusou a conexão.")
+            except Exception as error:
+                st.error(f"Falha ao conectar ao Gmail: {error}")
+    else:
+        st.warning("Gmail: ainda não configurado")
     st.write("GitHub Actions executará a triagem em horários programados depois que os segredos do Supabase forem cadastrados.")
