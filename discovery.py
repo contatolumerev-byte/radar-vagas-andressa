@@ -21,6 +21,10 @@ SEARCH_TERMS = [
     "analista de projetos junior", "pmo junior", "analista de crm",
     "analista de indicadores", "analista de performance junior",
     "assistente de operacoes", "assistente comercial inbound",
+    "ai creator junior", "analista de ia generativa",
+    "analista de automacao de processos", "analista de solucoes e automacoes",
+    "desenvolvedor low code junior", "desenvolvedor no code junior",
+    "aplicacoes internas junior", "internal tools junior",
 ]
 
 HEADERS = {"User-Agent": "RadarVagasAndressa/1.0 (busca pessoal de empregos)"}
