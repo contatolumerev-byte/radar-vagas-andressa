@@ -5,17 +5,9 @@ import streamlit as st
 
 from gemini_service import configured as gemini_configured, personalize
 from gmail_service import configured as gmail_configured, test_connection as test_gmail
+from resume_profile import TARGET_ROLE_GROUPS, resume_header
 from scoring import score_job
 from storage import add_job, list_jobs, mode, update_status
-
-
-PROFILE_HEADER = {
-    "name": "ANDRESSA ELLEN MARTINS FREIRE",
-    "headline": "Customer Success | Customer Experience | Relacionamento B2B | SaaS",
-    "location": "Fortaleza – CE",
-    "email": "contato.andressafreire@gmail.com",
-    "linkedin": "linkedin.com/in/andressafreire",
-}
 
 
 st.set_page_config(page_title="Radar de Vagas da Andressa", page_icon="🎯", layout="wide")
@@ -163,17 +155,21 @@ elif page == "Personalizar com Gemini":
 
 elif page == "Currículos":
     st.title("Currículos e personalização")
-    st.subheader("Cabeçalho confirmado")
+    st.subheader("Prévia do cabeçalho dinâmico")
+    preview_options = {"Perfil geral": None}
+    preview_options.update({f"{job['title']} — {job['company']}": job for job in jobs})
+    preview_label = st.selectbox("Visualizar cabeçalho para", list(preview_options))
+    profile_header = resume_header(preview_options[preview_label])
     st.markdown(
         f"""
-**{PROFILE_HEADER['name']}**  
-{PROFILE_HEADER['headline']}  
-{PROFILE_HEADER['location']}  
-{PROFILE_HEADER['email']}  
-{PROFILE_HEADER['linkedin']}
+**{profile_header['name']}**  
+{profile_header['headline']}  
+{profile_header['location']}  
+{profile_header['email']}  
+{profile_header['linkedin']}
 """
     )
-    st.caption("Os dados de contato entram no currículo final, mas não são enviados ao Gemini.")
+    st.caption("Somente a linha profissional muda conforme o título e a descrição da vaga. Nome e contatos permanecem fixos e não são enviados ao Gemini.")
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("Customer Success")
@@ -190,8 +186,9 @@ elif page == "Configurações":
     st.number_input("Nota de prioridade", min_value=70, max_value=100, value=85, disabled=True)
     st.number_input("Nota mínima para aprovação diária", min_value=0, max_value=100, value=70, disabled=True)
     st.number_input("Salário mínimo mensal", min_value=0, value=2500, step=100, disabled=True)
-    st.write("**Trilhas principais:** Customer Success/Relacionamento, RevOps/Sales Ops e Comercial consultivo sem hunting.")
-    st.write("**Trilhas adjacentes:** Operações, Processos, Projetos, CRM, Marketing Operacional, Dados/BI Júnior e Backoffice.")
+    st.subheader("Cargos que o radar vai mirar")
+    for group, roles in TARGET_ROLE_GROUPS.items():
+        st.write(f"**{group}:** " + "; ".join(roles) + ".")
     st.write("**Prioridade:** remoto no Brasil; híbrido/presencial somente em Fortaleza.")
     st.write("**Bloqueios:** hunting, outbound/cold call, telemarketing ativo, venda externa/porta a porta, shopping e escala 6x1.")
     st.caption("A edição persistente dessas regras será liberada após conectar o banco.")
