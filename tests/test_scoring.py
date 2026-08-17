@@ -67,6 +67,27 @@ class ScoringTest(unittest.TestCase):
         })
         self.assertEqual(result.decision, "AUTOAPLICAR")
 
+    def test_ai_creator_role_enters_daily_queue(self):
+        result = score_job({
+            "title": "AI Creator Júnior",
+            "location": "Brasil",
+            "work_mode": "Remoto",
+            "salary_min": 3500,
+            "description": "Criação de aplicativos internos com IA generativa, Streamlit, Supabase e automação de processos.",
+        })
+        self.assertGreaterEqual(result.score, 70)
+        self.assertIn(result.decision, {"AUTOAPLICAR", "REVISAR"})
+
+    def test_machine_learning_engineer_is_blocked(self):
+        result = score_job({
+            "title": "Machine Learning Engineer",
+            "location": "Brasil",
+            "work_mode": "Remoto",
+            "salary_min": 8000,
+            "description": "Modelagem, MLOps, Python e IA generativa.",
+        })
+        self.assertEqual(result.decision, "BLOQUEADA")
+
 
 if __name__ == "__main__":
     unittest.main()
