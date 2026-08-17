@@ -33,4 +33,12 @@ create table if not exists public.applications (
 alter table public.jobs enable row level security;
 alter table public.applications enable row level security;
 
--- O app usa a service role somente no servidor. Nunca coloque essa chave no código.
+-- A Data API fica disponível somente para a função de servidor.
+revoke all on table public.jobs from anon, authenticated;
+revoke all on table public.applications from anon, authenticated;
+grant usage on schema public to service_role;
+grant select, insert, update, delete on table public.jobs to service_role;
+grant select, insert, update, delete on table public.applications to service_role;
+
+-- A secret key assume a função service_role e fica somente no servidor.
+-- Nunca coloque essa chave no código ou no navegador.
