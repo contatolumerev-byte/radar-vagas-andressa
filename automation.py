@@ -20,7 +20,7 @@ def main() -> None:
     jobs = client.table("jobs").select("*").is_("score", "null").execute().data
     for job in jobs:
         result = score_job(job)
-        status = "Na fila" if result.decision in {"AUTOAPLICAR", "REVISAR"} else result.decision.title()
+        status = "Aguardando aprovação" if result.decision in {"AUTOAPLICAR", "REVISAR"} else result.decision.title()
         client.table("jobs").update({**result.to_dict(), "status": status}).eq("id", job["id"]).execute()
     print(f"Triagem concluída: {len(jobs)} vaga(s) processada(s).")
 
