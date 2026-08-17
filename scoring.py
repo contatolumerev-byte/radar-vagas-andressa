@@ -8,6 +8,12 @@ from dataclasses import dataclass, asdict
 
 
 ROLE_FAMILIES = [
+    ("Atendimento, Suporte e Relacionamento", 30, [
+        "atendimento ao cliente", "assistente de atendimento",
+        "analista de atendimento", "agente de atendimento",
+        "suporte ao cliente", "customer support", "customer service",
+        "assistente de relacionamento", "pos-venda", "pos venda",
+    ]),
     ("IA aplicada, Automação e Aplicativos", 32, [
         "ai creator", "analista de ia generativa", "generative ai analyst",
         "analista de automacao", "automacao de processos", "process automation",
@@ -92,7 +98,7 @@ HARD_BLOCKS = {
     "outbound": "Exige prospecção outbound",
     "prospeccao ativa": "Exige prospecção ativa",
     "cold call": "Exige cold calls",
-    "telemarketing ativo": "Telemarketing ativo",
+    "telemarketing": "Rotina de telemarketing",
     "porta a porta": "Venda externa/porta a porta",
     "vendedor externo": "Venda externa",
     "consultor externo": "Venda externa",
