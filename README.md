@@ -11,6 +11,7 @@ Aplicativo pessoal e gratuito para organizar vagas, aplicar regras transparentes
 - fila “Ação da Andressa” para CAPTCHA, SMS, vídeo e perguntas sensíveis;
 - modo demonstração sem banco e sem chave de IA;
 - persistência opcional no Supabase e triagem programada pelo GitHub Actions.
+- personalização opcional com Gemini, sem permitir que a IA ignore bloqueios objetivos.
 
 > Segurança: currículos, senhas e dados pessoais não devem ser versionados neste repositório. Use os Secrets do Streamlit/GitHub.
 
@@ -38,6 +39,19 @@ SUPABASE_SERVICE_ROLE_KEY = "sua-chave-service-role"
 4. Nos Secrets do repositório GitHub, cadastre os mesmos nomes para o workflow.
 
 Nunca envie essas chaves em conversa, commit ou captura de tela. A chave `service_role` fica somente nos cofres de secrets.
+
+## Conectar o Gemini gratuitamente
+
+1. Crie uma chave no [Google AI Studio](https://aistudio.google.com/app/apikey).
+2. No Streamlit, abra o app, clique em **Manage app**, depois **Settings** e **Secrets**.
+3. Adicione e salve:
+
+```toml
+GEMINI_API_KEY = "sua-chave"
+GEMINI_MODEL = "gemini-2.5-flash"
+```
+
+O Gemini é chamado somente quando você clica em **Gerar personalização**. No nível gratuito, não envie telefone, e-mail, CPF, endereço, currículo completo nem informações de saúde; use apenas o perfil profissional aprovado e a descrição pública da vaga.
 
 ## Rodar localmente
 
