@@ -12,6 +12,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: triagem-vagas
+  cancel-in-progress: true
+
 jobs:
   triagem:
     runs-on: ubuntu-latest
