@@ -9,7 +9,7 @@ from scoring import score_job
 
 def main() -> None:
     url = os.getenv("SUPABASE_URL")
-    key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+    key = os.getenv("SUPABASE_SECRET_KEY") or os.getenv("SUPABASE_SERVICE_ROLE_KEY")
     if not url or not key:
         print("Supabase não configurado; execução encerrada com segurança.")
         return
