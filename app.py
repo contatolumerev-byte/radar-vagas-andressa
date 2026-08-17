@@ -9,6 +9,15 @@ from scoring import score_job
 from storage import add_job, list_jobs, mode, update_status
 
 
+PROFILE_HEADER = {
+    "name": "ANDRESSA ELLEN MARTINS FREIRE",
+    "headline": "Customer Success | Customer Experience | Relacionamento B2B | SaaS",
+    "location": "Fortaleza – CE",
+    "email": "contato.andressafreire@gmail.com",
+    "linkedin": "linkedin.com/in/andressafreire",
+}
+
+
 st.set_page_config(page_title="Radar de Vagas da Andressa", page_icon="🎯", layout="wide")
 
 st.markdown(
@@ -154,6 +163,17 @@ elif page == "Personalizar com Gemini":
 
 elif page == "Currículos":
     st.title("Currículos e personalização")
+    st.subheader("Cabeçalho confirmado")
+    st.markdown(
+        f"""
+**{PROFILE_HEADER['name']}**  
+{PROFILE_HEADER['headline']}  
+{PROFILE_HEADER['location']}  
+{PROFILE_HEADER['email']}  
+{PROFILE_HEADER['linkedin']}
+"""
+    )
+    st.caption("Os dados de contato entram no currículo final, mas não são enviados ao Gemini.")
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("Customer Success")
